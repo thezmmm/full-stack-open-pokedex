@@ -26,7 +26,7 @@ jobs:
         run: npm test
 
       - name: Start dev server
-        run: npm run dev &
+        run: npm start &
 
       - name: Wait for frontend
         run: npx wait-on http://localhost:8080
