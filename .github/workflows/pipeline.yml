@@ -1,3 +1,10 @@
+name: pipeline
+
+on:
+  push:
+    branches:
+      - main
+
 jobs:
   lint_pipeline:
     runs-on: ubuntu-latest
