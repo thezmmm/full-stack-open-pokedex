@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  lint_pipeline:
+  simple_deployment_pipeline:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -18,3 +18,9 @@ jobs:
 
       - name: Check style
         run: npm run eslint
+
+      - name: Run build
+        run: npm run build
+
+      - name: Run tests
+        run: npm test
