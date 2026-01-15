@@ -39,17 +39,23 @@ jobs:
         run: |
           curl https://api.render.com/deploy/${{ secrets.RENDER_SERVICE_ID }}?key=${{ secrets.RENDER_API_KEY }}
       - name: Discord notification
-        uses: rjstone/discord-webhook-notify@v2
         if: ${{ github.event_name == 'push' && env.SKIP_RELEASE == 'false' }}
-        with:
-          webhookUrl: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          username: 'CI Bot'
-          text: Deployment Notification
-          description: |
-            Repository: ${{ github.repository }}
-            Commit: ${{ github.sha }}
-            Author: ${{ github.actor }}
-            Job status: ${{ job.status }}
+        env:
+          WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          COMMIT_SHA: ${{ github.sha }}
+          COMMIT_AUTHOR: ${{ github.actor }}
+          REPO_NAME: ${{ github.repository }}
+          JOB_STATUS: ${{ job.status }}
+          run: |
+            if [ "$JOB_STATUS" = "success" ]; then
+              MESSAGE="✅ Build & deployment successful!\nRepository: $REPO_NAME\nCommit: $COMMIT_SHA"
+            else
+              MESSAGE="❌ Build failed!\nRepository: $REPO_NAME\nCommit: $COMMIT_SHA\nAuthor: $COMMIT_AUTHOR\nCheck workflow logs for details."
+            fi
+            
+            curl -H "Content-Type: application/json" \
+                 -d "{\"content\": \"$MESSAGE\"}" \
+                 "$WEBHOOK_URL"
 
 
   tag_release:
