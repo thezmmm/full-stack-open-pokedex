@@ -51,7 +51,7 @@ tag_release:
 
     - name: Bump version and push tag
       if: ${{ github.event_name == 'push' && env.SKIP_RELEASE == 'false' }}
-      uses: anothrNick/github-tag-action@v1.67.0
+      uses: anothrNick/github-tag-action@8c8163ef62cf9c4677c8e800f36270af27930f42
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         DEFAULT_BUMP: patch
