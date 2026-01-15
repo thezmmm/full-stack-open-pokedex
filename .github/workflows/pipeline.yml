@@ -8,7 +8,7 @@ on:
     types: [opened, synchronize]
 
 env:
-  SKIP_RELEASE: ${{ contains(join(github.event.commits.*.message, ' '), '#skip') }}
+  SKIP_RELEASE: ${{ github.event_name == 'push' && contains(join(github.event.commits.*.message, ' '), '#skip') }}
 
 jobs:
   simple_deployment_pipeline:
@@ -38,6 +38,18 @@ jobs:
         if: ${{ github.event_name == 'push' && env.SKIP_RELEASE == 'false' }}
         run: |
           curl https://api.render.com/deploy/srv-${{ secrets.RENDER_SERVICE_ID }}?key=${{ secrets.RENDER_API_KEY }}
+      - name: Discord notification
+        if: ${{ always() }}
+        uses: Ilshidur/discord-webhook-notify@v2
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          username: 'CI Bot'
+          status: ${{ job.status }}
+          content: |
+            ${{ github.repository }} - Commit ${{ github.sha }} 
+            Job status: ${{ job.status }}
+            Author: ${{ github.actor }}
+
 
   tag_release:
     needs: [simple_deployment_pipeline]
