@@ -1,12 +1,13 @@
-name: pipeline
+name: Deployment pipeline
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize]
 
 env:
-  # true if ANY commit message contains '#skip'
   SKIP_RELEASE: ${{ contains(join(github.event.commits.*.message, ' '), '#skip') }}
 
 jobs:
@@ -19,36 +20,30 @@ jobs:
           node-version: '20'
       - name: Install dependencies
         run: npm install
-
       - name: Check style
         run: npm run eslint
-
-      - name: Run build
+      - name: Build
         run: npm run build
-
-      - name: Run tests
+      - name: Run unit tests
         run: npm test
-
       - name: Start dev server
         run: npm start &
-
       - name: Wait for frontend
         run: npx wait-on http://localhost:8080
-
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
-
-      - name: e2e tests
+      - name: Run e2e tests
         run: npm run test:e2e
-
+      - name: Trigger deployment
+        if: ${{ github.event_name == 'push' && env.SKIP_RELEASE == 'false' }}
+        run: |
+          curl https://api.render.com/deploy/srv-${{ secrets.RENDER_SERVICE_ID }}?key=${{ secrets.RENDER_API_KEY }}
 
   tag_release:
     needs: [simple_deployment_pipeline]
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
-
       - name: Bump version and push tag
         if: ${{ github.event_name == 'push' && env.SKIP_RELEASE == 'false' }}
         uses: anothrNick/github-tag-action@8c8163ef62cf9c4677c8e800f36270af27930f42
