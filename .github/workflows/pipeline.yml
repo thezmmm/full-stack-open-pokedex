@@ -42,7 +42,7 @@ jobs:
         uses: rjstone/discord-webhook-notify@v2
         if: ${{ github.event_name == 'push' && env.SKIP_RELEASE == 'false' }}
         with:
-          webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          webhookUrl: ${{ secrets.DISCORD_WEBHOOK_URL }}
           username: 'CI Bot'
           text: Deployment Notification
           description: |
