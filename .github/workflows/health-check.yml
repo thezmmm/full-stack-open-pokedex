@@ -8,7 +8,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Ping app
-        uses: ilammy/url-health-check@v1.6.1
-        with:
-          url: https://full-stack-open-pokedex-06vd.onrender.com/health
-          timeout: 10
+          run: |
+            if curl -f https://full-stack-open-pokedex-06vd.onrender.com/health; then
+              echo "App is up ✅"
+            else
+              echo "App is down ❌"
+              exit 1
+            fi
