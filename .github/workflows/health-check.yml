@@ -8,10 +8,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Ping app
-          run: |
-            if curl -f https://full-stack-open-pokedex-06vd.onrender.com/health; then
-              echo "App is up ✅"
-            else
-              echo "App is down ❌"
-              exit 1
-            fi
+        run: |
+          if curl -f https://full-stack-open-pokedex-06vd.onrender.com/health; then
+            echo "App is up ✅"
+          else
+            echo "App is down ❌"
+            exit 1
+          fi
